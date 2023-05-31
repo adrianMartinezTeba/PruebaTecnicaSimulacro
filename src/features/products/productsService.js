@@ -2,11 +2,12 @@ import axios from "axios";
 
 const getAllProducts = async () => {
   const res = await axios.get('https://fakestoreapi.com/products');
+ 
   return res.data;
 };
 
-const authService = {
+const productsService = {
     getAllProducts
 };
 
-export default authService;
+export default productsService;

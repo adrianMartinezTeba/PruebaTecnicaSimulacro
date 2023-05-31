@@ -1,44 +1,23 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import authService from "./authService";
-
+import {createSlice,createAsyncThunk} from '@reduxjs/toolkit';
+import productsService from './productsService';
 const initialState = {
-  products: products ? products : null,
+  products: []
 };
-
 export const productsSlice = createSlice({
-  name: "products",
+  name:'products',
   initialState,
-  reducers: {
-    reset: (state) => {
-      state.isError = false;
-      state.isSuccess = false;
-      state.message = "";
-    },
-  },
-  //userReducer
+  reducers:{},
   extraReducers: (builder) => {
     builder
-      .addCase(login.fulfilled, (state, action) => {
-        state.products = action.payload.products;
-        state.isSuccess = true;
-        state.message = action.payload.message;
-      })
-      .addCase(login.rejected,(state,action)=>{
-        state.isError = true;
-        state.message = action.payload
-      })
-  },
-});
-
-export const register = createAsyncThunk("products/getAllProducts",async (products, thunkAPI) => {
-    try {
-      return await authService.register(products);
-    } catch (error) {
-      const message = error.response.data.errors[0].message;
-      return thunkAPI.rejectWithValue(message);//action.payload
-    }
+      .addCase(getAllProducts.fulfilled, (state, action) => {
+        state.products = action.payload;
+      })}
+})
+export const getAllProducts = createAsyncThunk("products/getAllProducts", async () => {
+  try {
+    return await productsService.getAllProducts();
+  } catch (error) {
+    console.error(error);
   }
-);
-export const { reset } = authSlice.actions;
-
-export default authSlice.reducer;
+});
+export default productsSlice.reducer
