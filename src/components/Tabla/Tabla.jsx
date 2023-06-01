@@ -20,32 +20,32 @@ const Tabla = () => {
         // llamamos a la funcion para que al carggarse el componente nos traiga los productos
         dispatch(getAllProducts());
         // variable para manejar products
-        const productosOrdenados = [...products];
+        const prodOrd = [...products];
         // .sort es un metodo que nos ordena comparando un valor con otro a,b y nos va devolviendo en el mismo array los elemntos ordenados segun le digamos como condicion
         if (ordenActual.celda === "Nombre") {
             // Para identificar en el estado en que celda
             if (ordenActual.tipoOrden === "Asc") {
                 // y como la queremos
-                productosOrdenados.sort((a, b) => a.title.localeCompare(b.title));
+                prodOrd.sort((a, b) => a.title.localeCompare(b.title));
             } else {
-                productosOrdenados.sort((a, b) => b.title.localeCompare(a.title));
+                prodOrd.sort((a, b) => b.title.localeCompare(a.title));
                 // localcompare como que tiene de forma predeterminada ordenar por estandar lo hace segun idioma por orden alfabetico y tambien numerico
             }
         } else if (ordenActual.celda === "Precio") {
             if (ordenActual.tipoOrden === "Asc") {
-                productosOrdenados.sort((a, b) => a.price - b.price);
+                prodOrd.sort((a, b) => a.price - b.price);
             } else {
-                productosOrdenados.sort((a, b) => b.price - a.price);
+                prodOrd.sort((a, b) => b.price - a.price);
             }
         } else if (ordenActual.celda === "Categoría") {
             if (ordenActual.tipoOrden === "Asc") {
-                productosOrdenados.sort((a, b) => a.category.localeCompare(b.category));
+                prodOrd.sort((a, b) => a.category.localeCompare(b.category));
             } else {
-                productosOrdenados.sort((a, b) => b.category.localeCompare(a.category));
+                prodOrd.sort((a, b) => b.category.localeCompare(a.category));
             }
         }
         // actualizamos el estado de los productos del array vacio para tenr un array de los productos ordenados
-        setProductosOrdenados(productosOrdenados);
+        setProductosOrdenados(prodOrd);
     }, [products, ordenActual]);
     // Definimos esos dos parametros para que el estado se actualice si cambia el orden en el que queremos que se muestre
     // Función para manejar el cambio de celda de ordenación
@@ -53,23 +53,19 @@ const Tabla = () => {
         setOrdenActual({ celda, tipoOrden });
     };
 
-    // Número de productos a mostrar por página
+    // Número de productos a mostrar por página(de 5 en 5 queda más guay pq me hace la funcion de array.from 4 numeros por ser 20/5)
     const productsPerPage = 10;
     // Calcular el número total de páginas
-    const totalPages = Math.ceil(productosOrdenados.length / productsPerPage);
+    const totalPages = (productosOrdenados.length / productsPerPage);
 
     // Calcular los índices de los productos a mostrar en la página actual
+    // el indice del ultimo producto a mostrar por pagina va a ser la pagina por el numero totalPages,pag 1 el ultimo sera el 10 1*10 y de la 2 el ultimo sera 2 *20
     const indexOfLastProduct = currentPage * productsPerPage;
+    // y esto para tener el PromiseRejectionEvent,en la pagina 10-10 seria el primero y en la siguiente pagina tendria el valor 10 en el array es decir el 11 objeto
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
 
-    // Obtener los productos de la página actual
+    // Obtener los productos de la página actual productosOrdenados era products desestructurado y le decimos que coja la cantidada que hay entre las variables de antes para que nos muestre por pagina esos productos que luego vamos a mapear para el tbody y si pasa a la siguiente pag saca los otros
     let currentProducts = productosOrdenados.slice(indexOfFirstProduct, indexOfLastProduct);
-
-    // Función para manejar el cambio de página
-    const handlePageChange = (pageNumber) => {
-        setCurrentPage(pageNumber);
-    };
-
     // Crear un array con los números de página
     const pageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1);
     //Se le indica la longitud que va a tener el array primero y lo segundo es como una funcion .map que como no le pasamos ningun valor le decimos _ y le decimos que vamos a usar su indice y como el primero va a ser 0 le decimos mas uno en este caso el array va a ser de 2 pero asi hacemos que si la paginacion sea de 5 en 5 esto lo actualiza
@@ -108,14 +104,16 @@ const Tabla = () => {
                 </tbody>
             </table>
             <div className="pagination">
+                {/* para ir a la pagina anterior actualizamos el estado actual menos 1 */}
                 <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>
                     Anterior
                 </button>
                 <div>
+                    {/* le pasamos a el numero total de paginas un map para que nos haga boton por numero y que al hacer click se ejecute el cambio de estado de la pagina actual al numero de la pagina clickado*/}
                     {pageNumbers.map((pageNumber) => (
                         <button
                             key={pageNumber}
-                            onClick={() => handlePageChange(pageNumber)}
+                            onClick={() => setCurrentPage(pageNumber)}
                             disabled={pageNumber === currentPage}
                         >
                             {pageNumber}
